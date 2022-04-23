@@ -91,13 +91,16 @@ class Node:
         self.possible_children = next_states(self.state)
         self.depth = depth
 
-def greedy_best_first(root: Node, goal: list, heuristic_function):
+def best_first(root, goal, heuristic_function, type='greedy'):
     """Implementation of greedy best first algorithm"""
     count = 0
     open_queue = [root]
-    sorting_helper = lambda y: heuristic_function(goal, y.state)
     node = None
-    while open_queue and count < 3000:
+    if type == 'greedy':
+        sorting_helper = lambda y: heuristic_function(goal, y.state)
+    elif type == 'a*':
+        sorting_helper = lambda y: heuristic_function(goal, y.state) + y.depth
+    while open_queue and count < 500:
         node = open_queue.pop(0)
         if node.state == goal:
             break
@@ -113,24 +116,10 @@ def greedy_best_first(root: Node, goal: list, heuristic_function):
         path.append(" ".join(node.state))
         node = node.parent
         steps += 1
+
     path.reverse()
     for p in path:
         print (p)
-    return steps
-
-def a_star_best_first(root, goal, heuristic_function):
-    steps = 0
-    open_queue = [root]
-    while open_queue and steps < 1000:
-        node = open_queue.pop(0)
-        if node.state == goal:
-            break
-        print (" ".join(node.state))
-        open_queue.extend(
-            [Node(child_state, node, node.depth + 1) for child_state in node.possible_children]
-        )
-        steps += 1
-    print (" ".join(node.state))
     return steps
 
 if __name__ == '__main__':
@@ -140,4 +129,4 @@ if __name__ == '__main__':
     r3 = Node(['4', '1', '3', 'b', '8', '5', '2', '7', '6'])
     r4 = Node(['2', '3', '5', '1', '4', '6', '7', 'b', '8'])
     r5 = Node(['b', '2', '3', '1', '4', '5', '7', '8', '6'])
-    print ("Steps: ",greedy_best_first(r3, g, euclidean_distance))
+    print ("Steps: ",best_first(r2, g, manhattan_distance))
