@@ -104,7 +104,7 @@ def best_first(root, goal: list[str], heuristic_function, search_type: str):
     elif search_type == 'a*':
         sorting_helper = lambda y: heuristic_function(goal, y.state) + y.depth
     
-    while open_queue and count < 500:
+    while open_queue and count < 10000:
         node = open_queue.pop(0)
         closed_set.add("".join(node.state))
         if node.state == goal:
