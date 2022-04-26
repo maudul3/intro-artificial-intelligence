@@ -92,7 +92,13 @@ class Node:
         self.possible_children = next_states(self.state)
         self.depth = depth
 
-def best_first(root, goal: list[str], heuristic_function, search_type: str):
+def best_first(
+    root, 
+    goal: list[str], 
+    heuristic_function, 
+    search_type: str, 
+    terminate_at=1000
+):
     """Implementation of the best first algorithms"""
     count = 0
     closed_set = set()
@@ -104,7 +110,7 @@ def best_first(root, goal: list[str], heuristic_function, search_type: str):
     elif search_type == 'a*':
         sorting_helper = lambda y: heuristic_function(goal, y.state) + y.depth
     
-    while open_queue and count < 10000:
+    while open_queue and count < terminate_at:
         node = open_queue.pop(0)
         closed_set.add("".join(node.state))
         if node.state == goal:
@@ -151,4 +157,8 @@ if __name__ == '__main__':
                         heuristic.__name__
                     )
                 )
-                print (best_first(ri, g, heuristic, search))
+                print (
+                    best_first(
+                        ri, g, heuristic, search, terminate_at=100000
+                    )
+                )
