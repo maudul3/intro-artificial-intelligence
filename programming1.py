@@ -1,3 +1,4 @@
+from fileinput import close
 from numpy import sqrt
 
 blank_index_to_swap_indices = {
@@ -91,42 +92,63 @@ class Node:
         self.possible_children = next_states(self.state)
         self.depth = depth
 
-def best_first(root, goal, heuristic_function, type='greedy'):
-    """Implementation of greedy best first algorithm"""
+def best_first(root, goal: list[str], heuristic_function, search_type: str):
+    """Implementation of the best first algorithms"""
     count = 0
+    closed_set = set()
     open_queue = [root]
     node = None
-    if type == 'greedy':
+
+    if search_type == 'greedy':
         sorting_helper = lambda y: heuristic_function(goal, y.state)
-    elif type == 'a*':
+    elif search_type == 'a*':
         sorting_helper = lambda y: heuristic_function(goal, y.state) + y.depth
+    
     while open_queue and count < 500:
         node = open_queue.pop(0)
+        closed_set.add("".join(node.state))
         if node.state == goal:
             break
-        open_queue.extend(
-            [Node(child_state, node, node.depth + 1) for child_state in node.possible_children]
-        ) 
-        sorted(open_queue, key=sorting_helper)
+        open_queue.extend([ 
+        Node(child_state, node, node.depth + 1) 
+        for child_state in node.possible_children
+        if "".join(child_state) not in closed_set
+        ]) 
+        open_queue = sorted(open_queue, key=sorting_helper)
         count += 1
     
-    steps = 0
+    solution_steps = 0
     path = []
     while (node):
         path.append(" ".join(node.state))
         node = node.parent
-        steps += 1
-
+        solution_steps += 1
+        
     path.reverse()
     for p in path:
         print (p)
-    return steps
+    return solution_steps
 
 if __name__ == '__main__':
     g = ['1','2','3','4','5','6','7','8','b']
-    r1 = Node(['1','2', '3','4','5','6','7','b','8'])
-    r2 = Node(['1','5', '2','4','b','3','7','8','6'])
-    r3 = Node(['4', '1', '3', 'b', '8', '5', '2', '7', '6'])
-    r4 = Node(['2', '3', '5', '1', '4', '6', '7', 'b', '8'])
-    r5 = Node(['b', '2', '3', '1', '4', '5', '7', '8', '6'])
-    print ("Steps: ",best_first(r2, g, manhattan_distance))
+    r0 = Node(['1','2', '3','4','5','6','7','b','8'])
+    r1 = Node(['1','5', '2','4','b','3','7','8','6'])
+    r2 = Node(['4', '1', '3', 'b', '8', '5', '2', '7', '6'])
+    r3 = Node(['2', '3', '5', '1', '4', '6', '7', 'b', '8'])
+    r4 = Node(['b', '2', '3', '1', '4', '5', '7', '8', '6'])
+    r5 = Node("3 2 1 7 8 b 6 5 4".split(" "))
+    r = [r5, r0, r1, r2, r3, r4]
+    heuristics = [manhattan_distance, euclidean_distance, misplaced_tiles]
+    searches = ['greedy', 'a*']
+
+    for i, ri in enumerate(r):
+        for search in searches:
+            for heuristic in heuristics:
+                print (
+                    "Steps in {} via {} search and {} heuristic: ".format(
+                        " ".join(ri.state),
+                        search,
+                        heuristic.__name__
+                    )
+                )
+                print (best_first(ri, g, heuristic, search))
