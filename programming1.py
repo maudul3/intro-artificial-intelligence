@@ -1,6 +1,7 @@
 from fileinput import close
 from numpy import sqrt
 
+"""Dictionary that tracks which indices can be swapped in 8 puzzle """
 blank_index_to_swap_indices = {
     0: [1, 3],
     1: [0, 2, 4],
@@ -99,17 +100,19 @@ def best_first(
     search_type: str, 
     terminate_at=1000
 ):
-    """Implementation of the best first algorithms"""
+    """Implementation of the best first algorithm"""
     count = 0
     closed_set = set()
     open_queue = [root]
     node = None
 
+    """Identify different heuristic functions based on algorithm"""
     if search_type == 'greedy':
         sorting_helper = lambda y: heuristic_function(goal, y.state)
     elif search_type == 'a*':
         sorting_helper = lambda y: heuristic_function(goal, y.state) + y.depth
     
+    """Loop through nodes available for expansion"""
     while open_queue and count < terminate_at:
         node = open_queue.pop(0)
         closed_set.add("".join(node.state))
@@ -123,6 +126,11 @@ def best_first(
         open_queue = sorted(open_queue, key=sorting_helper)
         count += 1
     
+    if node.state != goal:
+        print ("Solution not found in {} expansions".format(terminate_at))
+        return -1
+
+    """Determine solution path and return average number of steps"""
     solution_steps = 0
     path = []
     while (node):
@@ -131,19 +139,17 @@ def best_first(
         solution_steps += 1
         
     path.reverse()
-    for p in path:
-        print (p)
+    print (" -> ".join(path))
     return solution_steps
 
 if __name__ == '__main__':
     g = ['1','2','3','4','5','6','7','8','b']
-    r0 = Node(['1','2', '3','4','5','6','7','b','8'])
     r1 = Node(['1','5', '2','4','b','3','7','8','6'])
     r2 = Node(['4', '1', '3', 'b', '8', '5', '2', '7', '6'])
     r3 = Node(['2', '3', '5', '1', '4', '6', '7', 'b', '8'])
-    r4 = Node(['b', '2', '3', '1', '4', '5', '7', '8', '6'])
+    r4 = Node('4 8 2 1 6 5 b 7 3'.split(" "))
     r5 = Node("3 2 1 7 8 b 6 5 4".split(" "))
-    r = [r5, r0, r1, r2, r3, r4]
+    r = [r1, r2, r3, r4, r5]
     heuristics = [manhattan_distance, euclidean_distance, misplaced_tiles]
     searches = ['greedy', 'a*']
 
