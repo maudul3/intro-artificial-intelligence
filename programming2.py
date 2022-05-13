@@ -1,4 +1,6 @@
 from random import randint, shuffle, random
+import matplotlib.pyplot as plt
+from numpy import mean
 
 MAX_FITNESS = 28
 
@@ -56,26 +58,35 @@ def generate_board():
 
 def GAQueens(population_size, num_iterations, mutation_pct = 0.01):
     population = [generate_board() for _ in range(population_size)]
-    """Run through each generation"""
+    iterations = []
+    average_fitness = []
+    # Run through each generation
     for i in range(num_iterations):
+        # Store data for plotting
+        iterations.append(i)
+        average_fitness.append(mean([x.fitness for x in population]))
+
+        # Split the population for breeding
         shuffle(population)
         half_pop = int(population_size/2)
         set1 = population[:half_pop]
         set2 = population[half_pop:]
         new_population = []
-        '''Breeding stage'''
+        if i % 15 == 0:
+            print (set1[0].rep, set2[0].rep)
+        # Breeding stage
         for parent1, parent2 in zip(set1, set2):
             if parent1.fitness == MAX_FITNESS:
                 print ("Solution found in {} iterations".format(i))
-                return parent1.rep
+                return parent1.rep, iterations, average_fitness
             if parent2.fitness == MAX_FITNESS:
                 print ("Solution found in {} iterations".format(i))
-                return parent2.rep
+                return parent2.rep, iterations, average_fitness
             child1, child2 = crossover(parent1.rep, parent2.rep, mutation_pct)
             new_population.append(child1)
             new_population.append(child2)
         population = new_population
-    return "No solution found in {} iterations".format(num_iterations)
+    return "No solution found in {} iterations".format(num_iterations), iterations, average_fitness
 
 if __name__ == '__main__':
     pop_size = [100, 250, 500, 1000]
@@ -83,4 +94,10 @@ if __name__ == '__main__':
     for size in pop_size:
         for iter in num_iterations:
             print ("Initial population size {}:".format(size))
-            print ( GAQueens(size, iter) )
+            final_solution, iterations, average_fitness = GAQueens(size, iter) 
+            print (final_solution)
+            plt.plot(iterations, average_fitness)
+            plt.title("Population = {}".format(size))
+            plt.xlabel("Generation #")
+            plt.ylabel("Average fitness")
+            plt.show()
