@@ -1,6 +1,7 @@
 from random import randint, shuffle, random
 import matplotlib.pyplot as plt
 from numpy import mean
+from pathlib import Path
 
 MAX_FITNESS = 28
 
@@ -56,7 +57,7 @@ def generate_board():
         "".join([str(randint(1, 8)) for _ in range(8)])
     )
 
-def GAQueens(population_size, num_iterations, mutation_pct = 0.01):
+def GAQueens(population_size, num_iterations, mutation_pct):
     population = [generate_board() for _ in range(population_size)]
     iterations = []
     average_fitness = []
@@ -90,14 +91,17 @@ def GAQueens(population_size, num_iterations, mutation_pct = 0.01):
 
 if __name__ == '__main__':
     pop_size = [100, 250, 500, 1000]
-    num_iterations = [1000]
+    mutation_pcts = [0.01, 0.001]
+    max_num_generations = [2000]
     for size in pop_size:
-        for iter in num_iterations:
-            print ("Initial population size {}:".format(size))
-            final_solution, iterations, average_fitness = GAQueens(size, iter) 
-            print (final_solution)
-            plt.plot(iterations, average_fitness)
-            plt.title("Population = {}".format(size))
-            plt.xlabel("Generation #")
-            plt.ylabel("Average fitness")
-            plt.show()
+        for pct in mutation_pcts:
+            for gen in max_num_generations:
+                print ("Initial population size {} and mutation {}:".format(size, pct))
+                final_solution, iterations, average_fitness = GAQueens(size, gen, pct) 
+                print (final_solution)
+                plt.plot(iterations, average_fitness)
+                plt.title("Population = {} and Mutation % = {}".format(size, pct))
+                plt.xlabel("Generation #")
+                plt.ylabel("Average fitness")
+                plt.savefig(Path().absolute() / Path('prog2pop{}mutation{}.jpeg'.format(size,pct)))
+                plt.clf()
