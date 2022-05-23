@@ -88,31 +88,45 @@ def run_action(row,col,action, grid):
 
     return row,col,grid,reward
 
+def max_key_value(keys, q):
+    max_key = None
+    max_value = -10000
+    for key in keys:
+        if q[key] > max_value:
+            max_key = key
+            max_value = q[key]
+        action = max_key[-1] # pull action state-action key
+    return action, q[max_key]
 
-def q_learning(num_actions, q_matrix, epsilon, eta=0.2):
+def q_learning(num_actions, q_matrix, epsilon, eta=0.2, gamma=0.9):
     grid = create_grid()
     row, col = randint(0, 9), randint(0, 9)
     total_reward = 0
+
+    # Run initial state work outside loop for performance
+    current_state = sense_state(row, col, grid)
+    keys = [key for key in q_matrix.keys() if current_state in key]
+    action, value = max_key_value(keys, q_matrix) 
     for _ in range(num_actions):
-        current_state = sense_state(row, col, grid)
         # Determine are state-action keys for this state
-        keys = [key for key in q_matrix.keys() if current_state in key]
-        if random() < epsilon: # randomly choose action
+        if random() < epsilon: # randomly choose action and ignore optimal
             action = choice(POSSIBLE_ACTIONS)
-        else: # choose optimal action
-            max_key = None
-            max_value = -10000
-            for key in keys:
-                if q_matrix[key] > max_value:
-                    max_key = key
-                    max_value = q_matrix[key]
-            action = max_key[-1] # pull action state-action key
+            
+        prev_state_action = current_state + action
         row,col,grid,reward = run_action(row,col,action,grid)
         total_reward += reward
 
+        # q-learning
+        current_state = sense_state(row, col, grid)
+        keys = [key for key in q_matrix.keys() if current_state in key]
+        action, value = max_key_value(keys, q_matrix) 
+        q_matrix[prev_state_action] += eta* (reward + gamma*value - q_matrix[prev_state_action] )
+    return q_matrix, total_reward
+
+
             
 if __name__ == '__main__':
-    episodes = 500
+    episodes = 5000
     actions = 200
     epsilon_start = 0.1
     epsilon = epsilon_start
@@ -123,3 +137,4 @@ if __name__ == '__main__':
             epsilon -= epsilon_start * (episodes / (ep + 1))
         q_matrix, total_reward = q_learning(actions, q_matrix, epsilon)
         rewards.append(total_reward)
+    print (rewards)
