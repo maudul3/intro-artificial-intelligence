@@ -6,4 +6,4 @@ Assignments:
 
 `programming2.py`: implementation of a genetic algorithm to solve the 8-queens puzzle (https://en.wikipedia.org/wiki/Eight_queens_puzzle). 
 
-`programming3.py`: implementation of Q-learning (model-free, off-policy reinforcement learning) to train a robot to effectively pick up cans in a 10 x 10. 
+`programming3.py`: implementation of Q-learning (model-free, off-policy reinforcement learning) to train a robot to effectively pick up cans in a 10 x 10 grid. 
