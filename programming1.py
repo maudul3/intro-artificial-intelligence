@@ -15,24 +15,56 @@ blank_index_to_swap_indices = {
 }
 
 def swap(state, idx1, idx2):
-    """Helper function used to swap blanks and adjacent squares"""
+    """Helper function used to swap blanks and adjacent squares
+    
+    Inputs:
+        state (list<str>): state space of 8 puzzle
+        idx1 (int): first index to swap 
+        idx2 (int): second index to swap
+
+    Outputs:
+        list<str>: state space of 8 puzzle after swapping 
+    """
     state_copy = list(state)
     state_copy[idx1] = state[idx2]
     state_copy[idx2] = state[idx1]
     return state_copy
 
 def next_states(state):
-    "Determine next possible configurations of the 8 puzzle"
+    """Determine next possible configurations of the 8 puzzle
+    
+    Inputs:
+      state (list<str>): state space of 8 puzzle 
+    
+    Outputs:
+        list<list<str>>: all possible next configurations of 8 puzzle
+    """
     blank_idx = state.index('b')
     swap_indices = blank_index_to_swap_indices[blank_idx]
     return [swap(state, blank_idx, swap_idx) for swap_idx in swap_indices]
 
 def misplaced_tiles(state1, state2):
-    """Determine the number of misplaced tiles"""
+    """Determine the number of misplaced tiles betwen state spaces
+    
+    Inputs:
+      state1 (list<str>): state space of 8 puzzle
+      state2 (list<str): state space of 8 puzzle
+    
+    Outputs:
+        int: count of misplaced tiles
+    """
     return sum( 1 if v1 != v2 else 0 for v1, v2 in zip(state1, state2) )
 
 def manhattan_distance(state1, state2):
-    """Implementation of manhattan distance. Not the cleanest."""
+    """Implementation of manhattan distance
+
+    Inputs:
+      state1 (list<str>): state space of 8 puzzle
+      state2 (list<str): state space of 8 puzzle
+    
+    Outputs:
+        int: mahattan distance 
+    """
     matrix1 = [
         [state1[0], state1[1], state1[2]],
         [state1[3], state1[4], state1[5]],
@@ -57,7 +89,15 @@ def manhattan_distance(state1, state2):
     return distance
 
 def euclidean_distance(state1, state2):
-    """Implementation of euclidean distance. Not the cleanest."""
+    """Implementation of euclidean distance. 
+    
+    Inputs:
+      state1 (list<str>): state space of 8 puzzle
+      state2 (list<str): state space of 8 puzzle
+    
+    Outputs:
+        int: euclidean distance 
+    """
     matrix1 = [
         [state1[0], state1[1], state1[2]],
         [state1[3], state1[4], state1[5]],
@@ -82,12 +122,21 @@ def euclidean_distance(state1, state2):
     return distance
 
 class Node:
+    """Node class"""
     def __init__(
         self, 
         state,
         parent=None,
         depth=0
     ) -> None:
+        """Constructor
+
+        Inputs:
+            self: object itself
+            state (list<str>): state space of current 8 puzzle
+            parent (list<str>): parent state space of current 8 puzzle
+            depth (int): number of expansions to complete
+        """
         self.state = state
         self.parent = parent
         self.possible_children = next_states(self.state)
@@ -100,7 +149,17 @@ def best_first(
     search_type: str, 
     terminate_at=1000
 ):
-    """Implementation of the best first algorithm"""
+    """Implementation of the best first algorithm
+    
+    Inputs:
+        goal (list<str>): goal configuration of 8 puzzle
+        heuristic_function ( f(str) ): heuristic function for evaluation of optimal state
+        search_type (str): type of search algorithm to use
+        terminate: maximum number of expansions 
+
+    Return:
+      list<list<str>>: state spaces needed to go from initial -> final
+    """
     count = 0
     closed_set = set()
     open_queue = [root]
