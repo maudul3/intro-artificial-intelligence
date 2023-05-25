@@ -7,7 +7,14 @@ MAX_FITNESS = 28
 
 
 def nonattacking(rep):
-    """Determine number of pairs of non-attacking queens"""
+    """Determine number of pairs of non-attacking queens
+
+    Inputs:
+        rep (str): string representation of queens' positions
+
+    Outputs:
+        int: count of non-attacking queens
+    """
     pairs = 0
     for i in range(8):
         for j in range(i + 1, 8):
@@ -24,12 +31,25 @@ class Board:
     """Board class to represent the 8 queens has strings and determine fitness"""
 
     def __init__(self, rep):
+        """Constructor
+
+        Inputs:
+            self: Board object itself
+            rep (str): string representation of the queens' positions
+        """
         self.rep = rep
         self.fitness = nonattacking(self.rep)
 
 
 def mutate(rep):
-    """Mutate child string"""
+    """Mutate child string by modifying a single position
+
+    Inputs:
+        rep (str): string representation of the queens' positions
+
+    Outputs:
+        (str): mutated representation of queens' positions
+    """
     idx = randint(0, 7)
     value = randint(1, 8)
     rep = rep[:idx] + str(value) + rep[(idx + 1) :]
@@ -37,7 +57,17 @@ def mutate(rep):
 
 
 def crossover(p1, p2, mutation_pct):
-    """Crossover of two parent board reps"""
+    """Crossover of two parent board reps
+
+    Inputs:
+        p1 (str): parent 1 representation of queens' positions
+        p2 (str): parent 2 representation of queens' positions
+        mutation_pct (float): likelihood of mutation of children
+
+    Outputs:
+        Board: child 1 of p1-p2 crossover
+        Board: child 2 p1-p2 crossover
+    """
 
     """Crossover"""
     crossover_point = randint(1, 7)
@@ -58,11 +88,30 @@ def crossover(p1, p2, mutation_pct):
 
 
 def generate_board():
-    """Generate a possible representation of the 8 queens problem"""
+    """Generate a possible representation of the 8 queens problem
+
+    Outputs:
+        Board: Board representation of 8 queens problem
+    """
     return Board("".join([str(randint(1, 8)) for _ in range(8)]))
 
 
 def GAQueens(population_size, num_iterations, mutation_pct):
+    """Runs an simulation of the GA queens problem via a genetic algorithm
+
+    Inputs:
+        population_size (int): size of initial population of boards
+        num_iterations (int): number of generations in the simulation
+        mutation_pct (float): mutation percentage likelihood in subsequent generation
+
+    Outputs:
+        tuple(str, int, list<float>):
+            (
+                representation of solution,
+                number of generations to solution,
+                average fitness for each generation
+            )
+    """
     population = [generate_board() for _ in range(population_size)]
     iterations = []
     average_fitness = []
